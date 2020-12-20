@@ -1,0 +1,19 @@
+{
+  "id": "48842392-3D2F-482F-901B-DC09DCEB2C28",
+  "organisation_id": "3E72D92E-F30D-4BB1-84F8-B9FA04F6E748",
+  "type": "accounts",
+  "attributes": {
+    "country": "GB",
+    "base_currency": "GBP",
+    "bank_id": "400302",
+    "bank_id_code": "",
+    "account_number": "10000004",
+    "customer_id": "987788",
+    "iban": "GB33BUKB20201555555555",
+    "bic": "BARCGB22XXX",
+    "account_classification": "Personal",
+    "joint_account": false,
+    "account_matching_opt_out": false,
+    "secondary_identification": "A1B2C3D4"
+  }
+}

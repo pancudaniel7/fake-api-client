@@ -15,40 +15,54 @@
 // Package configs provides library configuration functionality
 package configs
 
-import "os"
+import (
+	"fmt"
+	"os"
+	"sync"
+	"time"
+)
 
-// Properties type is used to keep all env variables library
-// properties
-type Properties struct {
-	APIBaseURLV1 string
+type properties struct {
+	BaseAPIURL        string
+	HttpClientTimeout time.Duration
 }
 
-// p singleton points to library properties object
-var p *Properties
+var (
+	once sync.Once
+	p    *properties
+)
 
-// Props fetches environment or default value for every Properties field
-// and returns a  pointer p *Properties of this the singleton object.
-// If p *Properties is nil the properties will be fetched once.
-func Props() *Properties {
-	if p == nil {
-		p = &Properties{
-			APIBaseURLV1: getEnvOrDefault("FAKE_API_BASE_URL_V1", "http://localhost:8080/v1"),
+func Props() *properties {
+	once.Do(func() {
+		p = &properties{
+			BaseAPIURL:        getEnvOrDefaultString("FAKE_BASE_API_URL", "http://localhost:8080/v1"),
+			HttpClientTimeout: getEnvOrDefaultDuration("FAKE_CLIENT_REQ_TIME_OUT", time.Minute),
 		}
-	}
+	})
 	return p
 }
 
-// getEnvOrDefault retrieve env variable for eKey variable name
-// or default value d if env variable dose not exists.
-func getEnvOrDefault(eKey, d string) string {
-	env := os.Getenv(eKey)
+func getEnvOrDefaultDuration(key string, d time.Duration) time.Duration {
+	env := os.Getenv(key)
+	if isEmpty(env) {
+		return d
+	}
+
+	i, err := time.ParseDuration(env)
+	if err != nil {
+		panic(fmt.Sprintf("fail to convert: %s with value: %s in to time duration: %s", key, env, err))
+	}
+	return i
+}
+
+func getEnvOrDefaultString(key, d string) string {
+	env := os.Getenv(key)
 	if isEmpty(env) {
 		return d
 	}
 	return env
 }
 
-// isEmpty return true or false if the v is a empty string or not
 func isEmpty(v string) bool {
 	return len(v) == 0
 }
