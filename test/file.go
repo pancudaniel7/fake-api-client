@@ -10,27 +10,28 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
-// limitations under the License.cd
+// limitations under the License.
 
-package errors
+package test
 
-import "fmt"
+import (
+	"io/ioutil"
+	"log"
+	"os"
+)
 
-type ResponseError struct {
-	StatusCode int
-	Message    string
-	CausedBy   error
-}
+func readFileAsBytes(path string) []byte {
+	jsonFile, err := os.Open(path)
+	if err != nil {
+		log.Fatalf("could not open file: %s", err)
+	}
 
-func (e ResponseError) Error() string {
-	return fmt.Sprintf("%s, status code: %d caused by: %s", e.Message, e.StatusCode, e.CausedBy)
-}
+	defer jsonFile.Close()
 
-type RequestError struct {
-	Message  string
-	CausedBy error
-}
+	bytes, err := ioutil.ReadAll(jsonFile)
+	if err != nil {
+		log.Fatalf("fail to read file as byte stream: %s", err)
+	}
 
-func (e RequestError) Error() string {
-	return fmt.Sprintf("%s, caused by: %s", e.Message, e.CausedBy)
+	return bytes
 }

@@ -12,26 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package test
+package api
 
-import (
-	"io/ioutil"
-	"log"
-	"os"
-)
-
-func readFileAsBytes(path string) []byte {
-	jsonFile, err := os.Open(path)
-	if err != nil {
-		log.Fatalf("Could not open file: %s", err)
-	}
-
-	defer jsonFile.Close()
-
-	bytes, err := ioutil.ReadAll(jsonFile)
-	if err != nil {
-		log.Fatalf("Fail to read file as byte stream: %s", err)
-	}
-
-	return bytes
+type Resource interface {
+	Create() (Resource, error)
+	List(pageNum, pageSize string) ([]Resource, error)
+	ListById() (Resource, error)
+	Delete() error
 }

@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"github.com/pancudaniel7/fake-api-client/configs"
 	"github.com/pancudaniel7/fake-api-client/pkg/errors"
+	"io"
 	"net/http"
 	"sync"
 )
@@ -52,27 +53,52 @@ func (c *clientAPI) SendRequest(req *http.Request, expCode int, resData interfac
 	}
 	defer res.Body.Close()
 
+	if err = handleExpectedStatusCode(*res, expCode); err != nil {
+		return err
+	}
+
+	if resData != nil {
+		fullResponse := Body{
+			Data: resData,
+		}
+		if err = json.NewDecoder(res.Body).Decode(&fullResponse); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func CreateRequest(method, reqUrl string, body io.Reader) (*http.Request, error) {
+	req, err := http.NewRequest(method, reqUrl, body)
+	if err != nil {
+		return nil, errors.RequestError{
+			Message:  fmt.Sprintf("fail to create %s request object: %s", method, err),
+			CausedBy: err}
+	}
+
+	return req, nil
+}
+
+func handleExpectedStatusCode(res http.Response, expCode int) error {
 	if res.StatusCode != expCode {
 		var errRes ErrorResponse
 
 		errMsg := "request error with different status code, expected: %d but returned: %d with error message: %s"
+
+		var err error
 		if err = json.NewDecoder(res.Body).Decode(&errRes); err != nil {
 			decErrMsg := "fail to decode error response body with error message: %s"
 
-			return errors.ResponseError{Message:
-			fmt.Sprintf(errMsg, expCode, res.StatusCode,
-				fmt.Sprintf(decErrMsg, err)), StatusCode: res.StatusCode}
+			return errors.ResponseError{
+				Message:    fmt.Sprintf(errMsg, expCode, res.StatusCode, fmt.Sprintf(decErrMsg, err)),
+				StatusCode: res.StatusCode,
+				CausedBy:   err}
 		}
 
 		return errors.ResponseError{
-			Message: fmt.Sprintf(errMsg, expCode, res.StatusCode, errRes.Message), StatusCode: res.StatusCode}
-	}
-
-	fullResponse := Body{
-		Data: resData,
-	}
-	if err = json.NewDecoder(res.Body).Decode(&fullResponse); err != nil {
-		return err
+			Message:    fmt.Sprintf(errMsg, expCode, res.StatusCode, errRes.Message),
+			StatusCode: res.StatusCode,
+			CausedBy:   err}
 	}
 	return nil
 }

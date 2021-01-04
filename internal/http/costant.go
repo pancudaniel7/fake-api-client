@@ -12,15 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package api
+package http
 
 const (
-	organizationPath = "/organisation"
-	accountPath      = organizationPath + "/accounts"
+	OrganizationPath = "/organisation"
+	AccountPath      = OrganizationPath + "/accounts"
+	VersionLabel     = "version="
+	pageNumberLabel  = "page[number]="
+	pageSizeLabel    = "page[size]="
 )
-
-type Resource interface {
-	Create() (Resource, error)
-	List() (Resource, error)
-	Delete() (Resource, error)
-}

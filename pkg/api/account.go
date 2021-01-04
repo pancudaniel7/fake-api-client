@@ -17,10 +17,8 @@ package api
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"github.com/pancudaniel7/fake-api-client/configs"
 	_http "github.com/pancudaniel7/fake-api-client/internal/http"
-	"github.com/pancudaniel7/fake-api-client/pkg/errors"
 	"net/http"
 	"time"
 )
@@ -58,20 +56,34 @@ func (a Account) Create() (Resource, error) {
 		return nil, err
 	}
 
-	reqUrl := configs.Props().BaseAPIURL + accountPath
-	req, err := http.NewRequest(http.MethodPost, reqUrl, bytes.NewReader(b))
+	reqUrl := configs.Props().BaseAPIURL + _http.AccountPath
+	body := bytes.NewReader(b)
+	req, err := _http.CreateRequest(http.MethodPost, reqUrl, body)
 	if err != nil {
-		return nil, errors.RequestError{Message: fmt.Sprintf("fail to create account post request object: %s", err)}
+		return nil, err
 	}
 
 	resAcc := &Account{}
 	return resAcc, _http.APIClient().SendRequest(req, http.StatusCreated, resAcc)
 }
 
-func (a Account) List() (Resource, error) {
+func (a Account) List(pageNum, pageSize string) ([]Resource, error) {
 	return nil, nil
 }
 
-func (a Account) Delete() (Resource, error) {
+func (a Account) ListById() (Resource, error) {
 	return nil, nil
+}
+
+func (a Account) Delete() error {
+
+	reqUrl := configs.Props().BaseAPIURL + _http.AccountPath +
+		"/" + a.ID +
+		"?" + _http.VersionLabel + configs.Props().HttpRecordVersion
+	req, err := _http.CreateRequest(http.MethodDelete, reqUrl, nil)
+	if err != nil {
+		return err
+	}
+
+	return _http.APIClient().SendRequest(req, http.StatusNoContent, nil)
 }

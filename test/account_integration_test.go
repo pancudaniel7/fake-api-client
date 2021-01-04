@@ -26,17 +26,20 @@ import (
 
 func TestAccountCreation(t *testing.T) {
 	acc := readFileAsAccount("data/account.json")
-	resAcc := create(acc).(*api.Account)
+	resResource, err := acc.Create()
+	if err != nil {
+		log.Fatalf("fail to create account resource: %s", err)
+	}
 
+	resAcc := resResource.(*api.Account)
 	assert.EqualValues(t, acc.Attributes, resAcc.Attributes)
 }
 
-func create(acc api.Account) api.Resource {
-	resAcc, err := acc.Create()
-	if err != nil {
-		log.Fatalf("Fail to create account: %s", err)
+func TestAccountDeletion(t *testing.T) {
+	acc := readFileAsAccount("data/account.json")
+	if err := acc.Delete(); err != nil {
+		log.Fatalf("fail to delete account resource:  %s", err)
 	}
-	return resAcc
 }
 
 func readFileAsAccount(path string) api.Account {
@@ -44,7 +47,7 @@ func readFileAsAccount(path string) api.Account {
 
 	acc := api.Account{}
 	if err := json.Unmarshal(accJsonBytes, &acc); err != nil {
-		log.Fatalf("Could not unmarshal acc bytes object: %s", err)
+		log.Fatalf("Fail to unmarshal account json file bytes: %s", err)
 	}
 	return acc
 }

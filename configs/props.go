@@ -23,8 +23,10 @@ import (
 )
 
 type properties struct {
-	BaseAPIURL        string
-	HttpClientTimeout time.Duration
+	BaseAPIURL          string
+	HttpClientTimeout   time.Duration
+	HttpRecordVersion   string
+	HttpDefaultPageSize string
 }
 
 var (
@@ -35,8 +37,10 @@ var (
 func Props() *properties {
 	once.Do(func() {
 		p = &properties{
-			BaseAPIURL:        getEnvOrDefaultString("FAKE_BASE_API_URL", "http://localhost:8080/v1"),
-			HttpClientTimeout: getEnvOrDefaultDuration("FAKE_CLIENT_REQ_TIME_OUT", time.Minute),
+			BaseAPIURL:          getEnvOrDefaultString("BASE_API_URL", "http://localhost:8080/v1"),
+			HttpClientTimeout:   getEnvOrDefaultDuration("HTTP_CLIENT_REQ_TIME_OUT", time.Minute),
+			HttpRecordVersion:   getEnvOrDefaultString("HTTP_RECORD_VERSION", "0"),
+			HttpDefaultPageSize: getEnvOrDefaultString("HTTP_DEFAULT_PAGE_SIZE", "2"),
 		}
 	})
 	return p
