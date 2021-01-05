@@ -58,6 +58,7 @@ func (a Account) Create() (Resource, error) {
 
 	reqUrl := configs.Props().BaseAPIURL + _http.AccountPath
 	body := bytes.NewReader(b)
+
 	req, err := _http.CreateRequest(http.MethodPost, reqUrl, body)
 	if err != nil {
 		return nil, err
@@ -68,22 +69,57 @@ func (a Account) Create() (Resource, error) {
 }
 
 func (a Account) List(pageNum, pageSize string) ([]Resource, error) {
-	return nil, nil
+
+	pagParam := _http.BuildPagination(pageNum, pageSize)
+	reqUrl := configs.Props().BaseAPIURL + _http.AccountPath
+	if len(pagParam) != 0 {
+		reqUrl += "?" + pagParam
+	}
+
+	req, err := _http.CreateRequest(http.MethodGet, reqUrl, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resAccList := &[]Account{}
+	if err = _http.APIClient().SendRequest(req, http.StatusOK, resAccList); err != nil {
+		return nil, err
+	}
+
+	return convertSlicesAccountToResource(*resAccList), nil
 }
 
 func (a Account) ListById() (Resource, error) {
-	return nil, nil
+
+	reqUrl := configs.Props().BaseAPIURL + _http.AccountPath +
+		"/" + a.ID
+
+	req, err := _http.CreateRequest(http.MethodGet, reqUrl, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resAcc := &Account{}
+	return resAcc, _http.APIClient().SendRequest(req, http.StatusOK, resAcc)
 }
 
 func (a Account) Delete() error {
-
 	reqUrl := configs.Props().BaseAPIURL + _http.AccountPath +
 		"/" + a.ID +
 		"?" + _http.VersionLabel + configs.Props().HttpRecordVersion
+
 	req, err := _http.CreateRequest(http.MethodDelete, reqUrl, nil)
 	if err != nil {
 		return err
 	}
 
 	return _http.APIClient().SendRequest(req, http.StatusNoContent, nil)
+}
+
+func convertSlicesAccountToResource(accList []Account) []Resource {
+	resAccRes := []Resource{}
+	for _, resAcc := range accList {
+		resAccRes = append(resAccRes, resAcc)
+	}
+	return resAccRes
 }

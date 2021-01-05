@@ -57,10 +57,11 @@ func (c *clientAPI) SendRequest(req *http.Request, expCode int, resData interfac
 		return err
 	}
 
+	fullResponse := Body{
+		Data: resData,
+	}
+
 	if resData != nil {
-		fullResponse := Body{
-			Data: resData,
-		}
 		if err = json.NewDecoder(res.Body).Decode(&fullResponse); err != nil {
 			return err
 		}
@@ -77,6 +78,18 @@ func CreateRequest(method, reqUrl string, body io.Reader) (*http.Request, error)
 	}
 
 	return req, nil
+}
+
+func BuildPagination(pageNum, pageSize string) string {
+	if len(pageNum) == 0 {
+		return ""
+	} else if len(pageSize) == 0 {
+		return pageNumberLabel + pageNum + "&" +
+			pageSizeLabel + configs.Props().HttpDefaultPageSize
+	}
+
+	return pageNumberLabel + pageNum + "&" +
+		pageSizeLabel + pageSize
 }
 
 func handleExpectedStatusCode(res http.Response, expCode int) error {

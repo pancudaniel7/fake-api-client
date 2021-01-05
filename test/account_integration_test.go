@@ -25,18 +25,160 @@ import (
 )
 
 func TestAccountCreation(t *testing.T) {
-	acc := readFileAsAccount("data/account.json")
-	resResource, err := acc.Create()
+
+	expAcc := readFileAsAccount("data/account.json")
+	resResource, err := expAcc.Create()
 	if err != nil {
 		log.Fatalf("fail to create account resource: %s", err)
 	}
 
 	resAcc := resResource.(*api.Account)
-	assert.EqualValues(t, acc.Attributes, resAcc.Attributes)
+
+	assert.EqualValues(t, expAcc.ID, resAcc.ID)
+	assert.EqualValues(t, expAcc.Type, resAcc.Type)
+	assert.EqualValues(t, expAcc.OrganisationID, resAcc.OrganisationID)
+	assert.EqualValues(t, expAcc.Attributes, resAcc.Attributes)
+
+	deleteAccount(expAcc)
 }
 
-func TestAccountDeletion(t *testing.T) {
-	acc := readFileAsAccount("data/account.json")
+func TestAllAccountListing(t *testing.T) {
+
+	expAccList := []api.Account{
+		readFileAsAccount("data/account.json"),
+		readFileAsAccount("data/second-account.json")}
+
+	for _, acc := range expAccList {
+		_, err := acc.Create()
+		if err != nil {
+			log.Fatalf("fail to create account resource: %s", err)
+		}
+	}
+
+	accResList, err := expAccList[0].List("", "")
+	if err != nil {
+		log.Fatalf("fail to list all accounts: %s", err)
+	}
+
+	assert.EqualValues(t, 2, len(accResList))
+
+	assert.EqualValues(t, expAccList[0].ID, accResList[0].(api.Account).ID)
+	assert.EqualValues(t, expAccList[0].Type, accResList[0].(api.Account).Type)
+	assert.EqualValues(t, expAccList[0].OrganisationID, accResList[0].(api.Account).OrganisationID)
+	assert.EqualValues(t, expAccList[0].Attributes, accResList[0].(api.Account).Attributes)
+
+	assert.EqualValues(t, expAccList[1].ID, accResList[1].(api.Account).ID)
+	assert.EqualValues(t, expAccList[1].Type, accResList[1].(api.Account).Type)
+	assert.EqualValues(t, expAccList[1].OrganisationID, accResList[1].(api.Account).OrganisationID)
+	assert.EqualValues(t, expAccList[1].Attributes, accResList[1].(api.Account).Attributes)
+
+	for _, acc := range expAccList {
+		deleteAccount(acc)
+	}
+}
+
+func TestPageAccountListing(t *testing.T) {
+
+	expAccList := []api.Account{
+		readFileAsAccount("data/account.json"),
+		readFileAsAccount("data/second-account.json"),
+		readFileAsAccount("data/third-account.json"),
+		readFileAsAccount("data/fourth-account.json")}
+
+	for _, acc := range expAccList {
+		_, err := acc.Create()
+		if err != nil {
+			log.Fatalf("fail to create account resource: %s", err)
+		}
+	}
+
+	accResList, err := expAccList[0].List("0", "")
+	if err != nil {
+		log.Fatalf("fail to list all accounts: %s", err)
+	}
+
+	assert.EqualValues(t, 2, len(accResList))
+
+	assert.EqualValues(t, expAccList[0].ID, accResList[0].(api.Account).ID)
+	assert.EqualValues(t, expAccList[0].Type, accResList[0].(api.Account).Type)
+	assert.EqualValues(t, expAccList[0].OrganisationID, accResList[0].(api.Account).OrganisationID)
+	assert.EqualValues(t, expAccList[0].Attributes, accResList[0].(api.Account).Attributes)
+
+	assert.EqualValues(t, expAccList[1].ID, accResList[1].(api.Account).ID)
+	assert.EqualValues(t, expAccList[1].Type, accResList[1].(api.Account).Type)
+	assert.EqualValues(t, expAccList[1].OrganisationID, accResList[1].(api.Account).OrganisationID)
+	assert.EqualValues(t, expAccList[1].Attributes, accResList[1].(api.Account).Attributes)
+
+	for _, acc := range expAccList {
+		deleteAccount(acc)
+	}
+}
+
+func TestPageAndSizeAccountListing(t *testing.T) {
+
+	expAccList := []api.Account{
+		readFileAsAccount("data/account.json"),
+		readFileAsAccount("data/second-account.json"),
+		readFileAsAccount("data/third-account.json"),
+		readFileAsAccount("data/fourth-account.json")}
+
+	for _, acc := range expAccList {
+		_, err := acc.Create()
+		if err != nil {
+			log.Fatalf("fail to create account resource: %s", err)
+		}
+	}
+
+	accResList, err := expAccList[0].List("1", "1")
+	if err != nil {
+		log.Fatalf("fail to list all accounts: %s", err)
+	}
+
+	assert.EqualValues(t, 1, len(accResList))
+
+	assert.EqualValues(t, expAccList[1].ID, accResList[0].(api.Account).ID)
+	assert.EqualValues(t, expAccList[1].Type, accResList[0].(api.Account).Type)
+	assert.EqualValues(t, expAccList[1].OrganisationID, accResList[0].(api.Account).OrganisationID)
+	assert.EqualValues(t, expAccList[1].Attributes, accResList[0].(api.Account).Attributes)
+
+	for _, acc := range expAccList {
+		deleteAccount(acc)
+	}
+}
+
+func TestAccountListById(t *testing.T) {
+
+	expAccList := []api.Account{
+		readFileAsAccount("data/account.json"),
+		readFileAsAccount("data/second-account.json"),
+		readFileAsAccount("data/third-account.json"),
+		readFileAsAccount("data/fourth-account.json")}
+
+	for _, acc := range expAccList {
+		_, err := acc.Create()
+		if err != nil {
+			log.Fatalf("fail to create account resource: %s", err)
+		}
+	}
+
+	resAcc, err := expAccList[2].ListById()
+	if err != nil {
+		log.Fatalf("fail to list all accounts: %s", err)
+	}
+
+	actAcc := resAcc.(*api.Account)
+
+	assert.EqualValues(t, expAccList[2].ID, actAcc.ID)
+	assert.EqualValues(t, expAccList[2].Type, actAcc.Type)
+	assert.EqualValues(t, expAccList[2].OrganisationID, actAcc.OrganisationID)
+	assert.EqualValues(t, expAccList[2].Attributes, actAcc.Attributes)
+
+	for _, acc := range expAccList {
+		deleteAccount(acc)
+	}
+}
+
+func deleteAccount(acc api.Account) {
 	if err := acc.Delete(); err != nil {
 		log.Fatalf("fail to delete account resource:  %s", err)
 	}

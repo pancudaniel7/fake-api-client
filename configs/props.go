@@ -16,7 +16,7 @@
 package configs
 
 import (
-	"fmt"
+	"log"
 	"os"
 	"sync"
 	"time"
@@ -54,7 +54,7 @@ func getEnvOrDefaultDuration(key string, d time.Duration) time.Duration {
 
 	i, err := time.ParseDuration(env)
 	if err != nil {
-		panic(fmt.Sprintf("fail to convert: %s with value: %s in to time duration: %s", key, env, err))
+		log.Fatalf("fail to convert: %s with value: %s in to time duration: %s", key, env, err)
 	}
 	return i
 }
