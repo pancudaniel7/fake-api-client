@@ -19,6 +19,7 @@ package test
 import (
 	"encoding/json"
 	"github.com/pancudaniel7/fake-api-client/pkg/api"
+	"github.com/pancudaniel7/fake-api-client/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"log"
 	"testing"
@@ -40,6 +41,53 @@ func TestAccountCreation(t *testing.T) {
 	assert.EqualValues(t, expAcc.Attributes, resAcc.Attributes)
 
 	deleteAccount(expAcc)
+}
+
+func TestFailAccountCreationForSameId(t *testing.T) {
+	acc := readFileAsAccount("data/account.json")
+
+	_, actErr := acc.Create()
+	if actErr != nil {
+		log.Fatalf("fail to create first account resource: %s", actErr)
+	}
+
+	expErr := errors.ResponseError{
+		StatusCode: 409,
+		Message:    "request error with different status code, expected: 201 but returned: 409 with error message: Account cannot be created as it violates a duplicate constraint",
+		CausedBy:   nil,
+	}
+
+	_, actErr = acc.Create()
+
+	assert.NotNil(t, actErr)
+	assert.EqualValues(t, expErr, actErr)
+
+	deleteAccount(acc)
+}
+
+func TestFailAccountCreationWithInvalidValues(t *testing.T) {
+	acc := readFileAsAccount("data/invalid-account.json")
+
+	expErr := errors.ResponseError{
+		StatusCode: 400,
+		Message: "request error with different status code, " +
+			"expected: 201 but returned: 400 with error message: " +
+			"validation failure list:\nvalidation failure list:\nvalidation " +
+			"failure list:\naccount_classification in body should be one of " +
+			"[Personal Business]\naccount_number in body should match " +
+			"'^[A-Z0-9]{0,64}$'\nbank_id in body should match '^[A-Z0-9]{0,16}$'\nbank_id_code " +
+			"in body should match '^[A-Z]{0,16}$'\nbase_currency in body should match " +
+			"'^[A-Z]{3}$'\nbic in body should match '^([A-Z]{6}[A-Z0-9]{2}|[A-Z]{6}[A-Z0-9]{5})$'\ncountry " +
+			"in body should match '^[A-Z]{2}$'\niban in body should match '^[A-Z]{2}[0-9]{2}[A-Z0-9]{0,64}$'\nid " +
+			"in body must be of type uuid: \"wrong uuid\"\norganisation_id in body must be of type uuid: \"wrong organisation id\"\ntype " +
+			"in body should be one of [accounts]",
+		CausedBy: nil,
+	}
+
+	_, actArr := acc.Create()
+
+	assert.NotNil(t, actArr)
+	assert.EqualValues(t, expErr, actArr)
 }
 
 func TestAllAccountListing(t *testing.T) {
@@ -146,6 +194,21 @@ func TestPageAndSizeAccountListing(t *testing.T) {
 	}
 }
 
+func TestFailAccountListingWithInvalidPageNumber(t *testing.T) {
+	acc := readFileAsAccount("data/account.json")
+
+	_, err := acc.Create()
+	if err != nil {
+		log.Fatalf("fail to create first account resource: %s", err)
+	}
+
+	resAcc, err := acc.List("999999999", "")
+
+	assert.EqualValues(t, len(resAcc), 0)
+
+	deleteAccount(acc)
+}
+
 func TestAccountListById(t *testing.T) {
 
 	expAccList := []api.Account{
@@ -176,6 +239,54 @@ func TestAccountListById(t *testing.T) {
 	for _, acc := range expAccList {
 		deleteAccount(acc)
 	}
+}
+
+func TestFailAccountListByInvalidId(t *testing.T) {
+	acc := readFileAsAccount("data/account.json")
+
+	_, err := acc.Create()
+	if err != nil {
+		log.Fatalf("fail to create first account resource: %s", err)
+	}
+
+	tempID := acc.ID
+	acc.ID = "wrong id value"
+	_, actErr := acc.ListById()
+
+	expErr := errors.ResponseError{
+		StatusCode: 400,
+		Message:    "request error with different status code, expected: 200 but returned: 400 with error message: id is not a valid uuid",
+		CausedBy:   nil,
+	}
+
+	assert.EqualValues(t, expErr, actErr)
+
+	acc.ID = tempID
+	deleteAccount(acc)
+}
+
+func TestFailAccountDeleteWithWrongId(t *testing.T) {
+	acc := readFileAsAccount("data/account.json")
+
+	_, err := acc.Create()
+	if err != nil {
+		log.Fatalf("fail to create first account resource: %s", err)
+	}
+
+	tempID := acc.ID
+	acc.ID = "wrong id value"
+	actErr := acc.Delete()
+
+	expErr := errors.ResponseError{
+		StatusCode: 400,
+		Message:    "request error with different status code, expected: 204 but returned: 400 with error message: id is not a valid uuid",
+		CausedBy:   nil,
+	}
+
+	assert.EqualValues(t, expErr, actErr)
+
+	acc.ID = tempID
+	deleteAccount(acc)
 }
 
 func deleteAccount(acc api.Account) {

@@ -1,0 +1,19 @@
+{
+  "id": "wrong uuid",
+  "organisation_id": "wrong organisation id",
+  "type": "wrong type",
+  "attributes": {
+    "country": "wrong country",
+    "base_currency": "wrong currency",
+    "bank_id": "wrong bank id",
+    "bank_id_code": "wrong bank id code",
+    "account_number": "wrong account number",
+    "customer_id": "wrong customer id",
+    "iban": "wrong iban",
+    "bic": "wrong bic",
+    "account_classification": "wrong classification",
+    "joint_account": false,
+    "account_matching_opt_out": false,
+    "secondary_identification": "A1B2C3D4"
+  }
+}

@@ -110,8 +110,7 @@ func handleExpectedStatusCode(res http.Response, expCode int) error {
 
 		return errors.ResponseError{
 			Message:    fmt.Sprintf(errMsg, expCode, res.StatusCode, errRes.Message),
-			StatusCode: res.StatusCode,
-			CausedBy:   err}
+			StatusCode: res.StatusCode}
 	}
 	return nil
 }
