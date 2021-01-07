@@ -14,6 +14,8 @@
 
 package http
 
+// constants describing path values and url query params labels
+// or it could contain other useful constant needed by http package.
 const (
 	OrganizationPath = "/organisation"
 	AccountPath      = OrganizationPath + "/accounts"

@@ -23,6 +23,7 @@ import (
 	"time"
 )
 
+// Account struct is used for defining Account resource.
 type Account struct {
 	ID             string     `json:"id"`
 	CreatedOn      time.Time  `json:"created_on"`
@@ -33,6 +34,7 @@ type Account struct {
 	Attributes     Attributes `json:"attributes"`
 }
 
+// Attributes struct is used for defining Account resource attributes.
 type Attributes struct {
 	AccountNumber               string   `json:"account_number"`
 	AccountClassification       string   `json:"account_classification"`
@@ -48,6 +50,11 @@ type Attributes struct {
 	Iban                        string   `json:"iban"`
 }
 
+// Create account method used for creating account resource type.
+// The method creates the request for creating account resource
+// or returns jsonError if it cannot parse the reqBody object,
+// or RequestError if cannot create the request,
+// or it returns the account if the account was successful created.
 func (a Account) Create() (Resource, error) {
 	reqBody := _http.Body{Data: a}
 
@@ -68,6 +75,10 @@ func (a Account) Create() (Resource, error) {
 	return resAcc, _http.APIClient().SendRequest(req, http.StatusCreated, resAcc)
 }
 
+// List method returns all account list if pageNum and pageSize are empty,
+// or specific account list by the pageNum and pageSize.
+// Also this method returns RequestError if the request could not be created
+// or if the response returns an error content.
 func (a Account) List(pageNum, pageSize string) ([]Resource, error) {
 
 	pagParam := _http.BuildPagination(pageNum, pageSize)
@@ -89,6 +100,9 @@ func (a Account) List(pageNum, pageSize string) ([]Resource, error) {
 	return convertSlicesAccountToResource(*resAccList), nil
 }
 
+// ListById method returns one account entity requested by the account id.
+// Also this method returns RequestError if the request could not be created
+// or if the response returns an error content.
 func (a Account) ListById() (Resource, error) {
 
 	reqUrl := configs.Properties().BaseAPIURL + _http.AccountPath +
@@ -103,6 +117,9 @@ func (a Account) ListById() (Resource, error) {
 	return resAcc, _http.APIClient().SendRequest(req, http.StatusOK, resAcc)
 }
 
+// Delete method delete account entity by account id.
+// Also this method returns RequestError if the request could not be created
+// or if the response returns an error content.
 func (a Account) Delete() error {
 	reqUrl := configs.Properties().BaseAPIURL + _http.AccountPath +
 		"/" + a.ID +
@@ -116,6 +133,8 @@ func (a Account) Delete() error {
 	return _http.APIClient().SendRequest(req, http.StatusNoContent, nil)
 }
 
+// convertSlicesAccountToResource helps with converting list of Account types list
+// in to a list of Resource types list.
 func convertSlicesAccountToResource(accList []Account) []Resource {
 	resAccRes := []Resource{}
 	for _, resAcc := range accList {

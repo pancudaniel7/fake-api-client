@@ -16,21 +16,25 @@ package errors
 
 import "fmt"
 
+// ResponseError struct defines a fail response.
 type ResponseError struct {
 	StatusCode int
 	Message    string
 	CausedBy   error
 }
 
+// Error returns error string response for ResponseError.
 func (e ResponseError) Error() string {
 	return fmt.Sprintf("%s, status code: %d caused by: %s", e.Message, e.StatusCode, e.CausedBy)
 }
 
+// ResponseError struct defines a fail request.
 type RequestError struct {
 	Message  string
 	CausedBy error
 }
 
+// Error returns error string response for RequestError.
 func (e RequestError) Error() string {
 	return fmt.Sprintf("%s, caused by: %s", e.Message, e.CausedBy)
 }

@@ -24,6 +24,8 @@ import (
 	"sync"
 )
 
+// An clientAPI represents the struct type used
+// to create singleton http client object.
 type clientAPI struct {
 	HTTPClient *http.Client
 }
@@ -33,6 +35,10 @@ var (
 	c    *clientAPI
 )
 
+// APIClient function return the clientAPI singleton object.
+// The object is used to communicate using http with the main server.
+// APIClient is initialised once (lazy load) when it used for the first time,
+// also it contains HttpClientTimeout property.
 func APIClient() *clientAPI {
 	once.Do(func() {
 		c = &clientAPI{
@@ -44,6 +50,13 @@ func APIClient() *clientAPI {
 	return c
 }
 
+// SendRequest method can send http requests and return http responses.
+// The method uses req as request object.
+// expCode is used to verify if the response is the correct one,
+// if the response dose not contains the expected status code the method
+// will return ErrorResponse containing description about the error.
+// the resData object is used to receive response body data or to send request body data.
+// if response cannot be decoded the method will return SyntaxError.
 func (c *clientAPI) SendRequest(req *http.Request, expCode int, resData interface{}) error {
 	req.Header.Set("Accept", "application/json")
 
@@ -69,6 +82,9 @@ func (c *clientAPI) SendRequest(req *http.Request, expCode int, resData interfac
 	return nil
 }
 
+// CreateRequest function is used to create request using http verb method,
+// reqUrl and data request body using NewRequest golang object.
+// If the object fails to return request will return custom RequestError.
 func CreateRequest(method, reqUrl string, body io.Reader) (*http.Request, error) {
 	req, err := http.NewRequest(method, reqUrl, body)
 	if err != nil {
@@ -80,6 +96,7 @@ func CreateRequest(method, reqUrl string, body io.Reader) (*http.Request, error)
 	return req, nil
 }
 
+// BuildPagination function return url query parameters regarding pageNum and pageSize values.
 func BuildPagination(pageNum, pageSize string) string {
 	if len(pageNum) == 0 {
 		return ""
@@ -92,6 +109,8 @@ func BuildPagination(pageNum, pageSize string) string {
 		pageSizeLabel + pageSize
 }
 
+// handleExpectedStatusCode function is used to handle ErrorResponse content type coming from requests.
+// The returned type is ResponseError containing all details is needed regarding the error.
 func handleExpectedStatusCode(res http.Response, expCode int) error {
 	if res.StatusCode != expCode {
 		var errRes ErrorResponse

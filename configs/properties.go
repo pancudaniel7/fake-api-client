@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package configs provides library configuration functionality
 package configs
 
 import (
@@ -22,6 +21,7 @@ import (
 	"time"
 )
 
+// properties struct is used to keep all library properties as a type.
 type properties struct {
 	BaseAPIURL          string
 	HttpClientTimeout   time.Duration
@@ -34,6 +34,9 @@ var (
 	p    *properties
 )
 
+// Properties method is used to access any library properties.
+// The function will return *properties pointer for the properties object
+// that can be used to access any library properties.
 func Properties() *properties {
 	once.Do(func() {
 		p = &properties{
@@ -46,6 +49,9 @@ func Properties() *properties {
 	return p
 }
 
+// getEnvOrDefaultDuration function will convert and return environment variable
+// with specific key in to time.Duration type.
+// If the environment variable is empty the default d value is returned.
 func getEnvOrDefaultDuration(key string, d time.Duration) time.Duration {
 	env := os.Getenv(key)
 	if isEmpty(env) {
@@ -59,6 +65,9 @@ func getEnvOrDefaultDuration(key string, d time.Duration) time.Duration {
 	return i
 }
 
+// getEnvOrDefaultString function will convert and return environment variable
+// with specified key in to time.Duration type.
+// If the environment variable is empty the default d value is returned.
 func getEnvOrDefaultString(key, d string) string {
 	env := os.Getenv(key)
 	if isEmpty(env) {
@@ -67,6 +76,7 @@ func getEnvOrDefaultString(key, d string) string {
 	return env
 }
 
+// isEmpty check if value v is empty.
 func isEmpty(v string) bool {
 	return len(v) == 0
 }

@@ -14,6 +14,9 @@
 
 package api
 
+// Resource interface is used to implement SOLID principles
+// but also polymorphism in the library code and outside of it.
+// Use this every time you want to manipulate an api resource entity.
 type Resource interface {
 	Create() (Resource, error)
 	List(pageNum, pageSize string) ([]Resource, error)

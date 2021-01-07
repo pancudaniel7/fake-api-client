@@ -14,10 +14,12 @@
 
 package http
 
+// ErrorResponse type needed to read error response content.
 type ErrorResponse struct {
 	Message string `json:"error_message" validate:"required"`
 }
 
+// Body type is used for response nad request http body content.
 type Body struct {
 	Data interface{} `json:"data" validate:"required"`
 }
