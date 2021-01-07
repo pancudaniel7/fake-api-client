@@ -36,7 +36,7 @@ func TestAccountDelete(t *testing.T) {
 	assert.Nil(t, err)
 }
 
-func TestFailAccountDeleteWithWrongId(t *testing.T) {
+func TestFailAccountDeleteWithInvalidId(t *testing.T) {
 	acc := readFileAsAccount("data/account.json")
 
 	_, err := acc.Create()

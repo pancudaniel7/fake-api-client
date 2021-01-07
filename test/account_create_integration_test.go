@@ -17,6 +17,7 @@
 package test
 
 import (
+	"encoding/json"
 	"github.com/pancudaniel7/fake-api-client/pkg/api"
 	"github.com/pancudaniel7/fake-api-client/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -32,12 +33,12 @@ func TestAccountCreation(t *testing.T) {
 		log.Fatalf("fail to create account resource: %s", err)
 	}
 
-	resAcc := resResource.(*api.Account)
+	actAcc := resResource.(*api.Account)
 
-	assert.EqualValues(t, expAcc.ID, resAcc.ID)
-	assert.EqualValues(t, expAcc.Type, resAcc.Type)
-	assert.EqualValues(t, expAcc.OrganisationID, resAcc.OrganisationID)
-	assert.EqualValues(t, expAcc.Attributes, resAcc.Attributes)
+	assert.EqualValues(t, expAcc.ID, actAcc.ID)
+	assert.EqualValues(t, expAcc.Type, actAcc.Type)
+	assert.EqualValues(t, expAcc.OrganisationID, actAcc.OrganisationID)
+	assert.EqualValues(t, expAcc.Attributes, actAcc.Attributes)
 
 	deleteAccount(expAcc)
 }
@@ -64,7 +65,7 @@ func TestFailAccountCreationForSameId(t *testing.T) {
 	deleteAccount(acc)
 }
 
-func TestFailAccountCreationWithInvalidValues(t *testing.T) {
+func TestFailAccountCreationWithAllInvalidValues(t *testing.T) {
 	acc := readFileAsAccount("data/invalid-account.json")
 
 	expErr := errors.ResponseError{
@@ -87,4 +88,14 @@ func TestFailAccountCreationWithInvalidValues(t *testing.T) {
 
 	assert.NotNil(t, actArr)
 	assert.EqualValues(t, expErr, actArr)
+}
+
+func readFileAsAccount(path string) api.Account {
+	accJsonBytes := readFileAsBytes(path)
+
+	acc := api.Account{}
+	if err := json.Unmarshal(accJsonBytes, &acc); err != nil {
+		log.Fatalf("Fail to unmarshal account json file bytes: %s", err)
+	}
+	return acc
 }

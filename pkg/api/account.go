@@ -56,7 +56,7 @@ func (a Account) Create() (Resource, error) {
 		return nil, err
 	}
 
-	reqUrl := configs.Props().BaseAPIURL + _http.AccountPath
+	reqUrl := configs.Properties().BaseAPIURL + _http.AccountPath
 	body := bytes.NewReader(b)
 
 	req, err := _http.CreateRequest(http.MethodPost, reqUrl, body)
@@ -71,7 +71,7 @@ func (a Account) Create() (Resource, error) {
 func (a Account) List(pageNum, pageSize string) ([]Resource, error) {
 
 	pagParam := _http.BuildPagination(pageNum, pageSize)
-	reqUrl := configs.Props().BaseAPIURL + _http.AccountPath
+	reqUrl := configs.Properties().BaseAPIURL + _http.AccountPath
 	if len(pagParam) != 0 {
 		reqUrl += "?" + pagParam
 	}
@@ -91,7 +91,7 @@ func (a Account) List(pageNum, pageSize string) ([]Resource, error) {
 
 func (a Account) ListById() (Resource, error) {
 
-	reqUrl := configs.Props().BaseAPIURL + _http.AccountPath +
+	reqUrl := configs.Properties().BaseAPIURL + _http.AccountPath +
 		"/" + a.ID
 
 	req, err := _http.CreateRequest(http.MethodGet, reqUrl, nil)
@@ -104,9 +104,9 @@ func (a Account) ListById() (Resource, error) {
 }
 
 func (a Account) Delete() error {
-	reqUrl := configs.Props().BaseAPIURL + _http.AccountPath +
+	reqUrl := configs.Properties().BaseAPIURL + _http.AccountPath +
 		"/" + a.ID +
-		"?" + _http.VersionLabel + configs.Props().HttpRecordVersion
+		"?" + _http.VersionLabel + configs.Properties().HttpRecordVersion
 
 	req, err := _http.CreateRequest(http.MethodDelete, reqUrl, nil)
 	if err != nil {

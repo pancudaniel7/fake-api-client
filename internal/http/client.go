@@ -37,7 +37,7 @@ func APIClient() *clientAPI {
 	once.Do(func() {
 		c = &clientAPI{
 			HTTPClient: &http.Client{
-				Timeout: configs.Props().HttpClientTimeout,
+				Timeout: configs.Properties().HttpClientTimeout,
 			},
 		}
 	})
@@ -85,7 +85,7 @@ func BuildPagination(pageNum, pageSize string) string {
 		return ""
 	} else if len(pageSize) == 0 {
 		return pageNumberLabel + pageNum + "&" +
-			pageSizeLabel + configs.Props().HttpDefaultPageSize
+			pageSizeLabel + configs.Properties().HttpDefaultPageSize
 	}
 
 	return pageNumberLabel + pageNum + "&" +

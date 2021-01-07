@@ -34,7 +34,7 @@ var (
 	p    *properties
 )
 
-func Props() *properties {
+func Properties() *properties {
 	once.Do(func() {
 		p = &properties{
 			BaseAPIURL:          getEnvOrDefaultString("BASE_API_URL", "http://localhost:8080/v1"),

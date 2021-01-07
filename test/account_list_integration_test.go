@@ -17,14 +17,12 @@
 package test
 
 import (
-	"encoding/json"
 	"github.com/pancudaniel7/fake-api-client/pkg/api"
 	"github.com/pancudaniel7/fake-api-client/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"log"
 	"testing"
 )
-
 
 func TestAllAccountListing(t *testing.T) {
 
@@ -199,14 +197,4 @@ func TestFailAccountListingByInvalidId(t *testing.T) {
 
 	acc.ID = tempID
 	deleteAccount(acc)
-}
-
-func readFileAsAccount(path string) api.Account {
-	accJsonBytes := readFileAsBytes(path)
-
-	acc := api.Account{}
-	if err := json.Unmarshal(accJsonBytes, &acc); err != nil {
-		log.Fatalf("Fail to unmarshal account json file bytes: %s", err)
-	}
-	return acc
 }
