@@ -50,7 +50,7 @@ func Properties() *properties {
 }
 
 // getEnvOrDefaultDuration function will convert and return environment variable
-// with specific key in to time.Duration type.
+// with specific key in to time.Duration type. The value should be given in nanoseconds.
 // If the environment variable is empty the default d value is returned.
 func getEnvOrDefaultDuration(key string, d time.Duration) time.Duration {
 	env := os.Getenv(key)
