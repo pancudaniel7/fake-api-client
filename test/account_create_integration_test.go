@@ -79,14 +79,13 @@ func TestFailAccountCreationWithAllInvalidValues(t *testing.T) {
 			"in body should match '^[A-Z]{0,16}$'\nbase_currency in body should match " +
 			"'^[A-Z]{3}$'\nbic in body should match '^([A-Z]{6}[A-Z0-9]{2}|[A-Z]{6}[A-Z0-9]{5})$'\ncountry " +
 			"in body should match '^[A-Z]{2}$'\niban in body should match '^[A-Z]{2}[0-9]{2}[A-Z0-9]{0,64}$'\nid " +
-			"in body must be of type uuid: \"wrong uuid\"\norganisation_id in body must be of type uuid: \"wrong organisation id\"\ntype " +
+			"in body must be of type uuid: \"invalid uuid\"\norganisation_id in body must be of type uuid: \"invalid organisation id\"\ntype " +
 			"in body should be one of [accounts]",
 		CausedBy: nil,
 	}
 
 	_, actArr := acc.Create()
 
-	assert.NotNil(t, actArr)
 	assert.EqualValues(t, expErr, actArr)
 }
 
