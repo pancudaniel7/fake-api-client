@@ -17,8 +17,9 @@
 package test
 
 import (
-	"github.com/pancudaniel7/fake-api-client/pkg/api"
 	"github.com/pancudaniel7/fake-api-client/pkg/errors"
+	"github.com/pancudaniel7/fake-api-client/pkg/model"
+	"github.com/pancudaniel7/fake-api-client/pkg/service"
 	"github.com/stretchr/testify/assert"
 	"log"
 	"testing"
@@ -26,27 +27,29 @@ import (
 
 func TestAccountDelete(t *testing.T) {
 	acc := readFileAsAccount("data/account.json")
+	a := service.Account{}
 
-	_, err := acc.Create()
+	_, err := a.Create(acc)
 	if err != nil {
 		log.Fatalf("fail to create first account resource: %s", err)
 	}
 
-	err = acc.Delete()
+	err = a.DeleteBy(acc.ID)
 	assert.Nil(t, err)
 }
 
 func TestFailAccountDeleteWithInvalidId(t *testing.T) {
 	acc := readFileAsAccount("data/account.json")
+	a := service.Account{}
 
-	_, err := acc.Create()
+	_, err := a.Create(acc)
 	if err != nil {
 		log.Fatalf("fail to create first account resource: %s", err)
 	}
 
 	tempID := acc.ID
 	acc.ID = "wrong id value"
-	actErr := acc.Delete()
+	actErr := a.DeleteBy(acc.ID)
 
 	expErr := errors.ResponseError{
 		StatusCode: 400,
@@ -57,11 +60,11 @@ func TestFailAccountDeleteWithInvalidId(t *testing.T) {
 	assert.EqualValues(t, expErr, actErr)
 
 	acc.ID = tempID
-	deleteAccount(acc)
+	deleteAccount(a, acc)
 }
 
-func deleteAccount(acc api.Account) {
-	if err := acc.Delete(); err != nil {
+func deleteAccount(a service.Account, acc model.Account) {
+	if err := a.DeleteBy(acc.ID); err != nil {
 		log.Fatalf("fail to delete account resource:  %s", err)
 	}
 }

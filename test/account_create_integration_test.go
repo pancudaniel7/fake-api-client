@@ -18,8 +18,9 @@ package test
 
 import (
 	"encoding/json"
-	"github.com/pancudaniel7/fake-api-client/pkg/api"
 	"github.com/pancudaniel7/fake-api-client/pkg/errors"
+	"github.com/pancudaniel7/fake-api-client/pkg/model"
+	"github.com/pancudaniel7/fake-api-client/pkg/service"
 	"github.com/stretchr/testify/assert"
 	"log"
 	"testing"
@@ -28,25 +29,28 @@ import (
 func TestAccountCreation(t *testing.T) {
 
 	expAcc := readFileAsAccount("data/account.json")
-	resResource, err := expAcc.Create()
+	a := service.Account{}
+
+	resResource, err := a.Create(expAcc)
 	if err != nil {
 		log.Fatalf("fail to create account resource: %s", err)
 	}
 
-	actAcc := resResource.(*api.Account)
+	actAcc := resResource.(*model.Account)
 
 	assert.EqualValues(t, expAcc.ID, actAcc.ID)
 	assert.EqualValues(t, expAcc.Type, actAcc.Type)
 	assert.EqualValues(t, expAcc.OrganisationID, actAcc.OrganisationID)
 	assert.EqualValues(t, expAcc.Attributes, actAcc.Attributes)
 
-	deleteAccount(expAcc)
+	deleteAccount(a, expAcc)
 }
 
 func TestFailAccountCreationForSameId(t *testing.T) {
 	acc := readFileAsAccount("data/account.json")
+	a := service.Account{}
 
-	_, actErr := acc.Create()
+	_, actErr := a.Create(acc)
 	if actErr != nil {
 		log.Fatalf("fail to create first account resource: %s", actErr)
 	}
@@ -57,16 +61,17 @@ func TestFailAccountCreationForSameId(t *testing.T) {
 		CausedBy:   nil,
 	}
 
-	_, actErr = acc.Create()
+	_, actErr = a.Create(acc)
 
 	assert.NotNil(t, actErr)
 	assert.EqualValues(t, expErr, actErr)
 
-	deleteAccount(acc)
+	deleteAccount(a, acc)
 }
 
 func TestFailAccountCreationWithAllInvalidValues(t *testing.T) {
 	acc := readFileAsAccount("data/invalid-account.json")
+	a := service.Account{}
 
 	expErr := errors.ResponseError{
 		StatusCode: 400,
@@ -84,15 +89,15 @@ func TestFailAccountCreationWithAllInvalidValues(t *testing.T) {
 		CausedBy: nil,
 	}
 
-	_, actArr := acc.Create()
+	_, actArr := a.Create(acc)
 
 	assert.EqualValues(t, expErr, actArr)
 }
 
-func readFileAsAccount(path string) api.Account {
+func readFileAsAccount(path string) model.Account {
 	accJsonBytes := readFileAsBytes(path)
 
-	acc := api.Account{}
+	acc := model.Account{}
 	if err := json.Unmarshal(accJsonBytes, &acc); err != nil {
 		log.Fatalf("Fail to unmarshal account json file bytes: %s", err)
 	}

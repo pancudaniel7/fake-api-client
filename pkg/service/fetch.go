@@ -12,28 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package api
+package service
 
-import "sync"
+import (
+	"github.com/pancudaniel7/fake-api-client/pkg/model"
+	"sync"
+)
 
 // resourcePromise struct is used to keep all needed objects in order to create
 // asynchronous promise functionality
 type resourcePromise struct {
 	wg  sync.WaitGroup
-	res Resource
+	res model.Resource
 	err error
 }
 
-// NewResourcePromise returns a new promise and calls immediately the function f
+// NewApiPromise returns a new promise and calls immediately the function f
 // in a new goroutine.
 // Also before the new goroutine method increments the wait group in order for being
 // able to reproduce asynchronous functionality.
-func NewResourcePromise(f func() (Resource, error)) *resourcePromise {
+func NewApiPromise(f func(acc model.Resource) (model.Resource, error), args model.Account) *resourcePromise {
 	p := &resourcePromise{}
 
 	p.wg.Add(1)
 	go func() {
-		p.res, p.err = f()
+		p.res, p.err = f(args)
 		p.wg.Done()
 	}()
 	return p
@@ -42,7 +45,7 @@ func NewResourcePromise(f func() (Resource, error)) *resourcePromise {
 // Then method is used to call a f function if the promise call was successful.
 // The method waits for goroutine using wait group, and after that calls the successful
 // f function if err object is nil.
-func (p *resourcePromise) Then(r func(res Resource)) *resourcePromise {
+func (p *resourcePromise) Then(r func(res model.Resource)) *resourcePromise {
 	go func() {
 		p.wg.Wait()
 		if p.err == nil {

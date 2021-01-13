@@ -1,6 +1,7 @@
 # fake-api-client
 
-- fake-api-client is a dependency library used for interacting with rest fake-api using Golang. 
+- fake-api-client is a pure dependency library example used for interacting with rest fake-api service using Golang. 
+  I've created this project in order to lear Golang.
 
 ### Get started
 
@@ -15,7 +16,7 @@ then in order to import library packages set **GOPROXY** and **GOPRIVATE** as fo
 
     require github.com/pancudaniel7/fake-api-client v1.0.0
 ```
-- Then you can access api **Resource** and make any operations like **create** using the object:
+- Then you can access api **service.Account** and make any operations like **create** using the object:
 ```go
     	acc := api.Account{
                 ID:             "9095b5f1-aa8d-40e2-8442-f4da2f576b4e",
@@ -37,7 +38,9 @@ then in order to import library packages set **GOPROXY** and **GOPRIVATE** as fo
                 JointAccount:                false,
                 Iban:                        "GB33BUKB20201555555555",}}
 
-        res, err := acc.Create()
+        a := service.Account{}
+
+        res, err := a.Create(acc)
         if err != nil {
             log.Fatalf("Fail to create account: %s", err)
         }
@@ -69,23 +72,23 @@ HTTP_DEFAULT_PAGE_SIZE  | 2 | List resources page size |
 
 ### Api operations
 
-- Api operations are described by **Resource** interface that is the parent of every api resource entity:
+- Api operations are described by **ApiOperations** interface that is the parent api services:
 
 ```go
   //resource.go
 
-  type Resource interface {
-      Create() (Resource, error)
-      List(pageNum, pageSize string) ([]Resource, error)
-      ListById() (Resource, error)
-      Delete() error
+  type ApiOperations interface {
+    Create(resource model.Resource) (model.Resource, error)
+    List(pageNum, pageSize string) ([]model.Resource, error)
+    ListBy(id string) (model.Resource, error)
+    DeleteBy(id string) error
   }
 ```
 
-- Also, client library supports **fetch** operations using **ResourcePromise** as in the example below:
+- Also, client library supports **fetch** operations using **NewApiPromise** as in the example below:
 ```go
     expAcc := api.Account{...}
-    p := api.NewResourcePromise(expAcc.Create)
+    p := api.NewApiPromise(expAcc.Create, expAcc)
 
     p.Then(func(res api.Resource) {
         // successful promise function code...
@@ -98,4 +101,3 @@ HTTP_DEFAULT_PAGE_SIZE  | 2 | List resources page size |
 
 ***
 **Name: Pancu Daniel**<br>
-**I am new to Go**

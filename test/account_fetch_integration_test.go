@@ -17,8 +17,9 @@
 package test
 
 import (
-	"github.com/pancudaniel7/fake-api-client/pkg/api"
 	"github.com/pancudaniel7/fake-api-client/pkg/errors"
+	"github.com/pancudaniel7/fake-api-client/pkg/model"
+	"github.com/pancudaniel7/fake-api-client/pkg/service"
 	"github.com/stretchr/testify/assert"
 	"log"
 	"testing"
@@ -26,12 +27,13 @@ import (
 
 func TestAccountFetchSuccessCreation(t *testing.T) {
 	expAcc := readFileAsAccount("data/account.json")
+	a := service.Account{}
 
 	doneChan := make(chan int)
-	p := api.NewResourcePromise(expAcc.Create)
+	p := service.NewApiPromise(a.Create, expAcc)
 
-	p.Then(func(res api.Resource) {
-		actAcc := res.(*api.Account)
+	p.Then(func(res model.Resource) {
+		actAcc := res.(*model.Account)
 
 		assert.EqualValues(t, expAcc.ID, actAcc.ID)
 		assert.EqualValues(t, expAcc.Type, actAcc.Type)
@@ -46,16 +48,17 @@ func TestAccountFetchSuccessCreation(t *testing.T) {
 	})
 	<-doneChan
 
-	deleteAccount(expAcc)
+	deleteAccount(a, expAcc)
 }
 
 func TestAccountFetchFailCreation(t *testing.T) {
 	expAcc := readFileAsAccount("data/invalid-account.json")
+	a := service.Account{}
 
 	doneChan := make(chan int)
-	p := api.NewResourcePromise(expAcc.Create)
+	p := service.NewApiPromise(a.Create, expAcc)
 
-	p.Then(func(res api.Resource) {
+	p.Then(func(res model.Resource) {
 		log.Fatalf("Should fail to fetch account creation: %s", res)
 	})
 

@@ -12,14 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package api
+package service
 
-// Resource interface is used to implement SOLID principles
+import "github.com/pancudaniel7/fake-api-client/pkg/model"
+
+// ApiOperations interface is used to implement SOLID principles
 // but also polymorphism in the library code and outside of it.
-// Use this every time you want to manipulate an api resource entity.
-type Resource interface {
-	Create() (Resource, error)
-	List(pageNum, pageSize string) ([]Resource, error)
-	ListById() (Resource, error)
-	Delete() error
+// Use this every time you want to manipulate an service resource entity.
+type ApiOperations interface {
+	Create(resource model.Resource) (model.Resource, error)
+	List(pageNum, pageSize string) ([]model.Resource, error)
+	ListBy(id string) (model.Resource, error)
+	DeleteBy(id string) error
 }
