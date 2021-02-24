@@ -1,7 +1,7 @@
 # fake-api-client
 
 - fake-api-client is a pure dependency library example used for interacting with rest fake-api service using Golang. 
-  I've created this project in order to lear Golang.
+  I've created this project in order to learn Golang.
 
 ### Get started
 
